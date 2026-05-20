@@ -131,6 +131,11 @@ def pulse(limit: int = 50) -> Dict[str, Any]:
     return {"events": feed.list(limit=limit)}
 
 
+@app.get("/events")
+def events() -> Dict[str, Any]:
+    return {"events": feed.list(limit=50)}
+
+
 @app.get("/pulse/bdi")
 def pulse_bdi() -> Dict[str, Any]:
     return bdi_state.snapshot()
