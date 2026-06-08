@@ -188,11 +188,19 @@
           fetchJson(HEALTH_URL),
           fetchJson(CB_URL)
         ])
+        console.log('Circuit breaker response:', cbData)
         if (healthStatus) {
           healthStatus.textContent = healthData.ok ? 'OK' : 'Unhealthy'
         }
         if (cbStatus) {
-          cbStatus.textContent = cbData.circuit_breaker?.state || 'unknown'
+          const state = cbData.state || 'unknown'
+          if (state === 'closed') {
+            cbStatus.textContent = 'CLOSED ✓'
+          } else if (state === 'open') {
+            cbStatus.textContent = 'OPEN ⚠️'
+          } else {
+            cbStatus.textContent = state
+          }
         }
         renderError('')
       } catch (err) {
