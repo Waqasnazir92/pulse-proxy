@@ -16,6 +16,7 @@ from baseline import baseline_reply, extract_text
 from bdi import BDIState
 from circuit_breaker import CircuitBreakerMiddleware
 from embeddings import embed_texts, novelty_score
+from governance_transformer import transform_to_governance_event
 from pulse_feed import PulseEvent, PulseFeed
 from refusal import detect_refusal
 
@@ -357,6 +358,17 @@ def pulse(limit: int = 50) -> Dict[str, Any]:
 @app.get("/events")
 def events() -> Dict[str, Any]:
     return {"events": feed.list(limit=50)}
+
+
+@app.get("/governance/events")
+def governance_events(limit: int = 50) -> Dict[str, Any]:
+    """
+    Returns proxy events transformed into the rich GovernanceEvent format
+    expected by the Pulse dashboard frontend (pulseledger).
+    """
+    raw_events = feed.list(limit=limit)
+    transformed = [transform_to_governance_event(e) for e in raw_events]
+    return {"events": transformed, "total": len(transformed)}
 
 
 @app.get("/pulse/bdi")
